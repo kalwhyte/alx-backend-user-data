@@ -24,26 +24,21 @@ class RedactingFormatter(logging.Formatter):
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-    def __init__(self):
+    def __init__(self, fields=()):
         super(RedactingFormatter, self).__init__(self.FORMAT)
+        self.fields = fields
+
+    def filter_datum(self, fields: List[str], redaction: str,
+                     message: str, separator: str) -> str:
+        """returns the log message obfuscated"""
+        if fields in self.fields:
+            return self.REDACTION
+        return message
 
     def format(self, record: logging.LogRecord) -> str:
         """filter values in incoming log records using filter_datum"""
-        return filter_datum(RedactingFormatter.FIELDS,
-                            RedactingFormatter.REDACTION,
-                            super(RedactingFormatter,
-                                  self).format(record),
-                            RedactingFormatter.SEPARATOR)
-
-    FIELDS = ['name', 'email', 'phone', 'ssn', 'password', 'ip']
-
-
-def get_logger() -> logging.Logger:
-    """returns a logging.Logger object"""
-    logger = logging.getLogger('user_data')
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    handler = logging.StreamHandler()
-    handler.setFormatter(RedactingFormatter())
-    logger.addHandler(handler)
-    return logger
+        data = super().format(record)
+        for field in self.fields:
+            data = data.replace(
+                f"{field}=", f"{field}={self.REDACTION}{self.SEPARATOR}")
+        return data
