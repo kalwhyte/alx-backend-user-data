@@ -2,8 +2,9 @@
 """ Module of Index views
 """
 from typing import List, TypeVar
-from flask import jsonify, abort, request
+from flask import request
 from api.v1.views import app_views
+import fnmatch
 
 
 class Auth:
@@ -13,12 +14,15 @@ class Auth:
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """Returns False - path and excluded_paths will not be used.
         """
-        if path is None or excluded_paths is None or excluded_paths == []:
+        if path is None or excluded_paths is None or excluded_paths:
             return True
         if path[-1] != '/':
             path += '/'
-        if path in excluded_paths:
-            return False
+
+        for excluded_path in excluded_paths:
+            if fnmatch.fnmatch(path, excluded_path):
+                return False
+
         return True
 
     def authorization_header(self, request=None) -> str:
