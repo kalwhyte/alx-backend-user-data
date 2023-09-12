@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm.exc import NoResultFound, InvalidRequestError
+from sqlalchemy.exc import NoResultFound, InvalidRequestError
 
 from user import Base, User
 
@@ -18,7 +18,7 @@ class DB:
         """Initialize a new DB instance
         """
         self._engine = create_engine("sqlite:///a.db", echo=True)
-        Base.metadata.drop_all(self._engine)
+        # Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
@@ -62,3 +62,13 @@ class DB:
         if user is None:
             raise NoResultFound
         return user
+
+
+if __name__ == "__main__":
+    db = DB()
+
+    user = db.add_user("test@test.com", "SuperHashedPwd")
+    print(f"User 1 ID: {user.id}")
+
+    user_2 = db.add_user("test@test.com", "SuperHashedPwd1")
+    print(f"User 2 ID: {user_2.id}")
