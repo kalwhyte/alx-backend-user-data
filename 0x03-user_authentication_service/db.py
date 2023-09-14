@@ -43,3 +43,17 @@ class DB:
             self._session.rollback()
             new_user = None
         return new_user
+
+    def find_user_by(self, **kwargs) -> User:
+        """ Finds a user instance in the DB """
+        fields, values = [], []
+        for k, value in kwargs.items():
+            if hasattr(User, k):
+                fields.append(getattr(User, k))
+                values.append(value)
+            else:
+                raise InvalidRequestError()
+            result = self._session.query(User).filter_by(**kwargs).first()
+            if result is None:
+                raise NoResultFound()
+            return result
