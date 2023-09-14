@@ -3,19 +3,19 @@
 """
 from flask import Flask, jsonify, request
 from auth import Auth
-from typing import TypeVar
 
 
 app = Flask(__name__)
 AUTH = Auth()
-T = TypeVar('T')
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
 def welcome() -> str:
-    """ GET / welcome message
+    """ GET /
+    Return:
+        - welcome message
     """
-    return jsonify({"message": "Bienvenue"}), 200
+    return jsonify({"message": "Bienvenue"})
 
 
 if __name__ == "__main__":
