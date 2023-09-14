@@ -13,9 +13,7 @@ T = TypeVar('T')
 
 @app.route('/', methods=['GET'], strict_slashes=False)
 def welcome() -> str:
-    """ GET /
-    Return:
-      - welcome message
+    """ GET / welcome message
     """
     return jsonify({"message": "Bienvenue"}), 200
 
