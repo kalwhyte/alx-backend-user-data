@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ database module
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, tuple_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -18,7 +18,7 @@ class DB:
         """Initialize a new DB instance
         """
         self._engine = create_engine("sqlite:///a.db", echo=True)
-        # Base.metadata.drop_all(self._engine)
+        Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
@@ -34,41 +34,41 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """ Add a user instance to the session DB
-
-        Args:
-            email (str): email of the user
-            hashed_password (str): hashed password of the user.
-
-        Returns:
-            User: the user instance
         """
-        new_user = User(email=email, hashed_password=hashed_password)
-        self._session.add(new_user)
-        self._session.commit()
+        try:
+            new_user = User(email=email, hashed_password=hashed_password)
+            self._session.add(new_user)
+            self._session.commit()
+        except Exception:
+            self._session.rollback()
+            new_user = None
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """ Finds a user instance in the DB
-
-        Args:
-            kwargs (dict): arguments to search for a user
-
-        Warning:
-            NoResultFound and InvalidRequestError exceptions are raised when no results are found
+        """ Finds a user instance in the DB """
+        fields, values = [], []
+        for k, v in kwargs.items():
+            if hasattr(User, k):
+                fields.append(getattr(User, k))
+                values.append(v)
+            else:
+                raise InvalidRequestError()
+            result = self._session.query(User).filter(tuple(*fields).in_([tuple(v)])).first()
+            if result is None:
+                raise NoResultFound()
+            return result
+        
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """ Update a user instance in the DB
         """
-        if not kwargs:
-            raise InvalidRequestError
-        user = self._session.query(User).filter_by(**kwargs).first()
+        user = self.find_user_by(id=user_id)
         if user is None:
-            raise NoResultFound
-        return user
-
-
-if __name__ == "__main__":
-    db = DB()
-
-    user = db.add_user("test@test.com", "SuperHashedPwd")
-    print(f"User 1 ID: {user.id}")
-
-    user_2 = db.add_user("test@test.com", "SuperHashedPwd1")
-    print(f"User 2 ID: {user_2.id}")
+            return
+        update_source = {}
+        for k, v in kwargs.items():
+            if hasattr(user, k):
+                update_source[getattr(User, k)] = v
+            else:
+                raise ValueError()
+        self._session.query(User).filter(User.id == user_id).update(update_source, syncronize_session=False, )
+        self._session.commit()
