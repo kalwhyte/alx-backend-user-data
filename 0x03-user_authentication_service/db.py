@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""DB module."""
-from sqlalchemy import create_engine, tuple_
+"""DB module.
+"""
+from sqlalchemy import create_engine
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -32,18 +33,16 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Adds a new user to the database."""
-        try:
-            new_user = User(email=email, hashed_password=hashed_password)
-            self._session.add(new_user)
-            self._session.commit()
-        except Exception:
-            self._session.rollback()
-            new_user = None
+        """Adds a new user to the database.
+        """
+        new_user = User(email=email, hashed_password=hashed_password)
+        self._session.add(new_user)
+        self._session.commit()
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """ Finds a user instance in the DB."""
+        """ Finds a user instance in the DB.
+        """
         fields, values = [], []
         for k, value in kwargs.items():
             if hasattr(User, k):
