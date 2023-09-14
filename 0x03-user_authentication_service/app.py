@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-""" set up a basic Flask app
+"""A simple Flask app with user authentication features.
 """
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, redirect
+
 from auth import Auth
 
 
@@ -9,11 +10,11 @@ app = Flask(__name__)
 AUTH = Auth()
 
 
-@app.route('/', methods=['GET'], strict_slashes=False)
-def welcome() -> str:
-    """ GET /
+@app.route("/", methods=["GET"], strict_slashes=False)
+def index() -> str:
+    """GET /
     Return:
-        - welcome message
+        - The home page's payload.
     """
     return jsonify({"message": "Bienvenue"})
 
