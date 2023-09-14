@@ -58,7 +58,13 @@ class DB:
         
 
     def update_user(self, user_id: int, **kwargs) -> None:
-        '''update user
+        '''update user attributes
+
+        Args:
+            user_id (int): user id
+
+        Raises:
+            ValueError: if user does not exist
         '''
         user = self.find_user_by(id=user_id)
         for key, value in kwargs.items():
@@ -67,5 +73,4 @@ class DB:
             setattr(user, key, value)
         self._session.commit()
         return None
-    
     
