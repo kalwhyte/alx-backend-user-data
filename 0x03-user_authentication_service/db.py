@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""DB module.
-"""
+"""DB module."""
 from sqlalchemy import create_engine, tuple_
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
@@ -33,8 +32,7 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Adds a new user to the database.
-        """
+        """Adds a new user to the database."""
         try:
             new_user = User(email=email, hashed_password=hashed_password)
             self._session.add(new_user)
@@ -45,7 +43,7 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """ Finds a user instance in the DB """
+        """ Finds a user instance in the DB."""
         fields, values = [], []
         for k, value in kwargs.items():
             if hasattr(User, k):
@@ -59,8 +57,7 @@ class DB:
             return result
         
     def update_user(self, user_id: int, **kwargs) -> None:
-        """Updates a user in the database.
-        """
+        """Updates a user in the database."""
         user = self.find_user_by(id=user_id)
         for k, value in kwargs.items():
             if hasattr(user, k):
