@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-'''Define a hash_password function
-'''
+'''Define a hash_password function'''
 import bcrypt
 
 
