@@ -36,6 +36,7 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
+
     def add_user(self, email: str, hashed_password: str) -> User:
         '''Save the user to the database
         '''
@@ -43,6 +44,7 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
+
 
     def find_user_by(self, **kwargs) -> User:
         '''find user by key word argument
@@ -55,6 +57,7 @@ class DB:
             if user is None:
                 raise NoResultFound
             return user
+
 
     def update_user(self, user_id: int, **kwargs) -> None:
         '''update user attributes
