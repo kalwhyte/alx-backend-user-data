@@ -43,32 +43,4 @@ class DB:
             self._session.rollback()
             new_user = None
         return new_user
-
-    def find_user_by(self, **kwargs) -> User:
-        """ Finds a user instance in the DB """
-        fields, values = [], []
-        for k, v in kwargs.items():
-            if hasattr(User, k):
-                fields.append(getattr(User, k))
-                values.append(v)
-            else:
-                raise InvalidRequestError()
-            result = self._session.query(User).filter(tuple(*fields).in_([tuple(v)])).first()
-            if result is None:
-                raise NoResultFound()
-            return result
-        
-    def update_user(self, user_id: int, **kwargs) -> None:
-        """ Update a user instance in the DB
-        """
-        user = self.find_user_by(id=user_id)
-        if user is None:
-            return
-        update_source = {}
-        for k, v in kwargs.items():
-            if hasattr(user, k):
-                update_source[getattr(User, k)] = v
-            else:
-                raise ValueError()
-        self._session.query(User).filter(User.id == user_id).update(update_source, syncronize_session=False, )
-        self._session.commit()
+    
