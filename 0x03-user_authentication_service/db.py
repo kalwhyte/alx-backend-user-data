@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """DB module
 """
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -32,9 +34,15 @@ class DB:
         return self.__session
     
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Save the user to the database and return a User object
+        """Save the user to the database
         """
         new_user = User(email=email, hashed_password=hashed_password)
         self._session.add(new_user)
         self._session.commit()
         return new_user
+    
+    def find_user_by(self, **kwargs) -> User:
+        """ Takes in arbitrary keyword arguments and returns the first row
+            found in the users table as filtered by the method’s input
+        """
+        return self._session.query(User).filter_by(**kwargs).first()
