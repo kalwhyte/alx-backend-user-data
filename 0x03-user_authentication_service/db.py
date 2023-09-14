@@ -34,15 +34,25 @@ class DB:
         return self.__session
     
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Save the user to the database
-        """
+        '''Save the user to the database
+        '''
         new_user = User(email=email, hashed_password=hashed_password)
         self._session.add(new_user)
         self._session.commit()
         return new_user
     
     def find_user_by(self, **kwargs) -> User:
-        """ Takes in arbitrary keyword arguments and returns the first row
-            found in the users table as filtered by the method’s input
-        """
+        '''find user by key word argument
+        '''
         return self._session.query(User).filter_by(**kwargs).first()
+    
+    def update_user(self, user_id: int, **kwargs) -> None:
+        '''update user
+        '''
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if not hasattr(user, key):
+                raise ValueError
+            setattr(user, key, value)
+        self._session.commit()
+        return None
